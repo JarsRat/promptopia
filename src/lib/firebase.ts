@@ -2,18 +2,36 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-// Si planeas usar Analytics, como en tu código inicial:
-// import { getAnalytics } from "firebase/analytics";
+// import { getAnalytics } from "firebase/analytics"; // Descomenta si usas Analytics
 
+// Leer las variables de entorno
 const firebaseConfig = {
-  apiKey: "AIzaSyCWwK3cB80BzlVN5GNt7ULtnF1p_UUU5mY", // Reemplaza con tu apiKey
-  authDomain: "promtopia-20ce7.firebaseapp.com", // Reemplaza con tu authDomain
-  projectId: "promtopia-20ce7", // Reemplaza con tu projectId
-  storageBucket: "promtopia-20ce7.firebasestorage.app", // Reemplaza con tu storageBucket
-  messagingSenderId: "541414065888", // Reemplaza con tu messagingSenderId
-  appId: "1:541414065888:web:0a7db91b3264c4f4893285", // Reemplaza con tu appId
-  measurementId: "G-RG6LMDLXJ0" // Este es opcional, pero lo tenías en tu config original
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID, // Opcional
 };
+
+// Validar que todas las variables de entorno necesarias estén presentes
+// (especialmente útil en desarrollo para detectar errores de configuración)
+if (
+  !firebaseConfig.apiKey ||
+  !firebaseConfig.authDomain ||
+  !firebaseConfig.projectId ||
+  !firebaseConfig.storageBucket ||
+  !firebaseConfig.messagingSenderId ||
+  !firebaseConfig.appId
+) {
+  // En un entorno de producción, podrías querer manejar esto de forma diferente,
+  // pero para desarrollo, un error claro es útil.
+  console.error("Error: Faltan variables de entorno de Firebase. Asegúrate de que tu archivo .env.local esté configurado correctamente.");
+  // Podrías incluso lanzar un error para detener la inicialización si es crítico:
+  // throw new Error("Faltan variables de entorno de Firebase.");
+}
+
 
 // Inicializar Firebase
 let app;
@@ -26,13 +44,9 @@ if (!getApps().length) {
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Si decides usar Analytics, puedes descomentar esto y exportarlo también.
 // let analytics;
-// if (typeof window !== 'undefined') { // Analytics solo funciona en el cliente
+// if (typeof window !== 'undefined' && firebaseConfig.measurementId) {
 //   analytics = getAnalytics(app);
 // }
 
-export { app, auth, db }; // Si usas analytics, añade 'analytics' aquí.
-
-
-
+export { app, auth, db }; // , analytics }; // Añade analytics si lo usas
